@@ -1,0 +1,12 @@
+DECLARE 
+    Cursor CR is SELECT S.idsport, S.libelle, count(distinct SS.idgymnase) as nbgym
+    FROM SPORTS S,SEANCE SS
+    WHERE S.idport = SS.idsport
+    GROUP by S.idsport, s.libelle;
+BEGIN
+    FOR item in CR
+    Loop
+        DBMS output.put_Line('Le sport' || item.libelle ||' est'|| item.nbgym);
+    END Loop;
+    close CR;
+END;

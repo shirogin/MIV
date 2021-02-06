@@ -1,0 +1,14 @@
+//Exo 1: 
+example 3:
+
+Debut
+    n6=3,n7=2;
+
+    fork et1;
+    fork et2;
+    fotk et3;
+
+    et1:
+        T1; fork
+
+Fin
