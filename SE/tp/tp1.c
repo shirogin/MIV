@@ -2,10 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h> 
+#include <sys/mman.h>
 #include <unistd.h> 
 #include <pthread.h> 
 
-int TAB[] = {1, 12, 7,  57, 2, 10, 54, 47, 0, 16};
+int TAB[] = {1, 12, 7,  57, 2, 10, 54, 47, 0, 16},
+    n,
+    *Tab1,
+    *Tab2;
 
 void printTable(int Tab[], int d,int f)
 {
@@ -14,7 +18,10 @@ void printTable(int Tab[], int d,int f)
         printf("%d, ", Tab[i]);
     printf("%d ]\n", Tab[f]);
 }
-
+void printDetail(int Tab[],int d,int f,int index,int pivot){
+    printf("debut : %d --- fin : %d --- INDEX_PIVOT : %d --- VALEUR_PIVOT : %d TABLE : ", d, f, index,pivot);
+    printTable(TAB, d,f);
+}
 void swap(int *a, int *b)
 {
     int perm = *a;
@@ -24,68 +31,61 @@ void swap(int *a, int *b)
 void Copy(int original[],int copy[],int n){
     for (int i = 0; i < n; i++) copy[i]=original[i];
 }
-void Quick(int TAB[], int d, int f, int n)
-{
-    int pivot = (f + d) / 2, value = TAB[pivot], i = d, j = f;
-    while (i != j)
+void Partition(int TAB[],int pivot,int *i,int *j){
+    while ((*i) != (*j))
     {
-        while (TAB[i] < value) i++;
-        while (TAB[j] > value) j--;
-        swap(&TAB[j], &TAB[i]);
+        while (TAB[*i] < pivot) (*i)++;
+        while (TAB[*j] > pivot) (*j)--;
+        swap(&TAB[*j], &TAB[*i]);
     }
-    printf("debut : %d --- fin : %d --- INDEX_PIVOT : %d --- VALEUR_PIVOT : %d TABLE : ", d, f, pivot, value);
-    printTable(TAB, d,f);
-    if (i > (d + 1))
-        Quick(TAB, d, i - 1, n);
-    if (i < (f - 1))
-        Quick(TAB, i + 1, f, n);
 }
-void AsyncFQuick(int *TAB[], int d, int f, int n,char *pos)
+void Quick( int d, int f)
 {
-    int pivot = (f + d) / 2, value = (*TAB)[pivot], i = d, j = f;
-    while (i != j)
-    {
-        while ((*TAB)[i] < value) i++;
-        while ((*TAB)[j] > value) j--;
-        swap(&(*TAB)[j], &(*TAB)[i]);
-    }
-    printf("Async %s debut : %d --- fin : %d --- INDEX_PIVOT : %d --- VALEUR_PIVOT : %d TABLE : ",pos, d, f, pivot, value);
-    printTable((*TAB), d,f);
+    int index=(f + d) / 2,pivot = Tab1[index], i = d, j = f;
+    Partition(Tab1,pivot,&i,&j);
+
+    printDetail(Tab1,d,f,index,pivot);
     
+    if (i > (d + 1))
+        Quick(d, i - 1);
+    if (i < (f - 1))
+        Quick(i + 1, f);
+}
+void AsyncFQuick(int d, int f)
+{
+    int index=(f + d) / 2,pivot = Tab2[index], i = d, j = f;
+    Partition(Tab2,pivot,&i,&j);
+    
+    printDetail(Tab2,d,f,index,pivot);
     
     if (i > (d + 1) && (fork()==0)){
-        AsyncFQuick(TAB, d, i - 1, n,"left\0");
-        exit(0);
+        AsyncFQuick( d, i - 1);
+        exit(EXIT_SUCCESS);
 	}
     if (i < (f - 1) && (fork()==0)){
-        AsyncFQuick(TAB, i + 1, f, n,"right\0");
-        exit(0);
+        AsyncFQuick( i + 1, f);
+        exit(EXIT_SUCCESS);
 	}
 
     wait(NULL);
 	wait(NULL);
 }
-void AsyncTQuick( int d, int f, int n);
+void AsyncTQuick( int d, int f);
 void *ThreadHandle(void *args){
     int *var=(int *) args;
-    AsyncTQuick(var[0],var[1],var[2]);
+    AsyncTQuick(var[0],var[1]);
     return NULL;
 }
-void AsyncTQuick(int d, int f, int n)
+void AsyncTQuick(int d, int f)
 {
-    int pivot = (f + d) / 2, value = TAB[pivot], i = d, j = f;
-    while (i != j)
-    {
-        while (TAB[i] < value) i++;
-        while (TAB[j] > value) j--;
-        swap(&TAB[j], &TAB[i]);
-    }
-    printf("debut : %d --- fin : %d --- INDEX_PIVOT : %d --- VALEUR_PIVOT : %d TABLE : ", d, f, pivot, value);
-    printTable(TAB, d,f);
+    int index=(f + d) / 2,pivot = TAB[index], i = d, j = f;
+    Partition(TAB,pivot,&i,&j);
+
+    printDetail(TAB,d,f,index,pivot);
 
     pthread_t l,r;
-    int left[] = { d, i - 1, n},
-        right[] = { i + 1, f, n};
+    int left[] = { d, i - 1},
+        right[] = { i + 1, f};
     
     if (i > (d + 1))
         pthread_create(&l,NULL,ThreadHandle,& left);
@@ -102,32 +102,32 @@ void AsyncTQuick(int d, int f, int n)
 
 int main()
 {
-    int n = sizeof(TAB) / sizeof(int),
-        Tab1[n] ,
-        Tab2[n] ,
-        *tab=Tab2;
+    n = sizeof(TAB) / sizeof(int);
+    Tab1=(int *)malloc(sizeof(int)*n);
+    Tab2=(int *)malloc(sizeof(int)*n);
     Copy(TAB,Tab1,n);
-    Copy(TAB,Tab2,n);
-
+    
     //SYNC
     printf("Sync Table none sorted : ");
     printTable(Tab1, 0,n-1);
-    Quick(Tab1, 0, n - 1, n);
+    Quick( 0, n - 1);
     printf("Sync Table sorted : ");
     printTable(Tab1,0,n-1);
     
+    Tab2=mmap(NULL,sizeof *Tab2,PROT_READ | PROT_WRITE,MAP_SHARED| MAP_ANONYMOUS,-1,0);
+    Copy(TAB,Tab2,n);
     //ASYNC FORK
     printf("\nAsync Table none sorted (fork) : ");
-    printTable(tab, 0,n-1);
-    AsyncFQuick(&tab, 0, n - 1, n,"Table\0");
+    printTable(Tab2, 0,n-1);
+    AsyncFQuick( 0, n - 1);
     printf("Async Table sorted (fork) : ");
-    printTable(tab, 0,n-1);  
+    printTable(Tab2, 0,n-1);  
+    munmap(Tab2,sizeof *Tab2);
     
     //ASYNC THREADS
     printf("\nAsync Table none sorted (thread) : ");
     printTable(TAB,0 ,n-1);
-    AsyncTQuick(0,n-1,n);
-    printTable(TAB,0,n-1);
+    AsyncTQuick(0,n-1);
     printf("Async Table sorted (thread) : ");
     printTable(TAB, 0,n-1);
     return 0;
