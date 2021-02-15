@@ -6,7 +6,7 @@
 #include <unistd.h> 
 #include <pthread.h> 
 
-int TAB[] = {1, 12, 7,  57, 2, 10, 54, 47, 0, 16},
+int TAB[] = {3, 44, 38, 5, 47, 15, 36, 26, 420, 27, 2, 69, 46, 4, 19, 50, 48, -1},
     n,
     *Tab1,
     *Tab2;
@@ -20,7 +20,7 @@ void printTable(int Tab[], int d,int f)
 }
 void printDetail(int Tab[],int d,int f,int index,int pivot){
     printf("debut : %d --- fin : %d --- INDEX_PIVOT : %d --- VALEUR_PIVOT : %d TABLE : ", d, f, index,pivot);
-    printTable(TAB, d,f);
+    printTable(Tab, 0,n-1);
 }
 void swap(int *a, int *b)
 {
@@ -31,18 +31,20 @@ void swap(int *a, int *b)
 void Copy(int original[],int copy[],int n){
     for (int i = 0; i < n; i++) copy[i]=original[i];
 }
-void Partition(int TAB[],int pivot,int *i,int *j){
-    while ((*i) != (*j))
+int Partition(int TAB[],int pivot,int d,int f){
+    int i=d,j=f;
+    while (i != j)
     {
-        while (TAB[*i] < pivot) (*i)++;
-        while (TAB[*j] > pivot) (*j)--;
-        swap(&TAB[*j], &TAB[*i]);
+        while (TAB[i] < pivot) (i)++;
+        while (TAB[j] > pivot) (j)--;
+        swap(&TAB[j], &TAB[i]);
     }
+    return i;
 }
 void Quick( int d, int f)
 {
-    int index=(f + d) / 2,pivot = Tab1[index], i = d, j = f;
-    Partition(Tab1,pivot,&i,&j);
+    int index=(f + d) / 2,pivot = Tab1[index],
+        i=Partition(Tab1,pivot,d,f);
 
     printDetail(Tab1,d,f,index,pivot);
     
@@ -53,16 +55,15 @@ void Quick( int d, int f)
 }
 void AsyncFQuick(int d, int f)
 {
-    int index=(f + d) / 2,pivot = Tab2[index], i = d, j = f;
-    Partition(Tab2,pivot,&i,&j);
+    int index=(f + d) / 2,pivot = Tab2[index];
+    int i=Partition(Tab2,pivot,d,f);
     
-    printDetail(Tab2,d,f,index,pivot);
-    
-    if (i > (d + 1) && (fork()==0)){
+    printf("Tab[%d]== %d\n",i,Tab2[i]);
+    if (i > d  && (fork()==0)){
         AsyncFQuick( d, i - 1);
         exit(EXIT_SUCCESS);
 	}
-    if (i < (f - 1) && (fork()==0)){
+    if (i < f && (fork()==0)){
         AsyncFQuick( i + 1, f);
         exit(EXIT_SUCCESS);
 	}
@@ -78,8 +79,8 @@ void *ThreadHandle(void *args){
 }
 void AsyncTQuick(int d, int f)
 {
-    int index=(f + d) / 2,pivot = TAB[index], i = d, j = f;
-    Partition(TAB,pivot,&i,&j);
+    int index=(f + d) / 2,pivot = TAB[index], 
+        i = Partition(TAB,pivot,d,f);
 
     printDetail(TAB,d,f,index,pivot);
 
@@ -114,14 +115,11 @@ int main()
     printf("Sync Table sorted : ");
     printTable(Tab1,0,n-1);
     
-    Tab2=mmap(NULL,sizeof *Tab2,PROT_READ | PROT_WRITE,MAP_SHARED| MAP_ANONYMOUS,-1,0);
+    //Tab2=mmap(NULL,sizeof *Tab2,PROT_READ | PROT_WRITE,MAP_SHARED| MAP_ANONYMOUS,-1,0);
     Copy(TAB,Tab2,n);
     //ASYNC FORK
-    printf("\nAsync Table none sorted (fork) : ");
-    printTable(Tab2, 0,n-1);
+    printf("\nAsync Table none sorted (fork) : \n");
     AsyncFQuick( 0, n - 1);
-    printf("Async Table sorted (fork) : ");
-    printTable(Tab2, 0,n-1);  
     munmap(Tab2,sizeof *Tab2);
     
     //ASYNC THREADS
