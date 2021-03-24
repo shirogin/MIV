@@ -6,7 +6,7 @@
 #include <unistd.h> 
 #include <pthread.h> 
 
-int TAB[] = {3, 44, 38, 5, 47, 15, 36, 26, 420, 27, 2, 69, 46, 4, 19, 50, 48, -1},
+int TAB[] = {31, 44, 38, 150, 47, 1500, 36, 26, 420, 27, 2, 69, 46, 4, 19, 50, 48, 8},
     n,
     *Tab1,
     *Tab2;
@@ -59,17 +59,17 @@ void AsyncFQuick(int d, int f)
     int i=Partition(Tab2,pivot,d,f);
     
     printf("Tab[%d]== %d\n",i,Tab2[i]);
-    if (i > d  && (fork()==0)){
+    if (i > d  && (fork()==0))
         AsyncFQuick( d, i - 1);
-        exit(EXIT_SUCCESS);
-	}
-    if (i < f && (fork()==0)){
+        
+	
+    if (i < f && (fork()==0))
         AsyncFQuick( i + 1, f);
-        exit(EXIT_SUCCESS);
-	}
+        
 
     wait(NULL);
 	wait(NULL);
+    exit(EXIT_SUCCESS);
 }
 void AsyncTQuick( int d, int f);
 void *ThreadHandle(void *args){

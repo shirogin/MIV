@@ -1,5 +1,10 @@
 {
     "files.associations": {
-        "type_traits": "c"
+        "type_traits": "c",
+        "shm.h": "c",
+        "types.h": "c",
+        "ipc.h": "c",
+        "sem.h": "c",
+        "dijkstra.h": "c"
     }
 }
