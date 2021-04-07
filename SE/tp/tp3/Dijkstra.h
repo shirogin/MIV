@@ -10,12 +10,7 @@
 *
 */
 
-int sem_create(cle, initval)
-    /* creation d'un semaphore relie a cle */
-    /* de valeur initiale initval
-*/
-    key_t cle;
-int initval;
+int sem_create(key_t cle, int initval)
 {
     int semid;
     union semun

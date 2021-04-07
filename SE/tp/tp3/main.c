@@ -53,6 +53,7 @@ void ConsProdF(const int FileMess, const int T, const int ConsProdS, const int C
         temp = msg_recieve(FileMess, N);
         printf("    Processus ConsProd : Message est recu '%s'\n\n", temp);
         P(ConsProdS);
+        printf("    Processus ConsProd : Message est ecrit dans la memoire T %d : '%s'\n\n", (i - 1) % M, temp);
         tab[(i - 1) % M] = i;
         V(ConsS);
         i++;
@@ -69,7 +70,7 @@ void ConsF(const int T, const int ConsProdS, const int ConsS)
         P(ConsS);
         printf("    Processus Cons :    Message afficher '%d'\n\n", tab[(i - 1) % M]);
         i++;
-        sleep(2);
+        sleep(5);
         V(ConsProdS);
     }
     shm_dettatch((char *)tab);
@@ -82,7 +83,7 @@ int main()
 
     // CreationDesSemaphores
     Seprate;
-    int ConsProdS = sem_create(ConsProdC, M - 1),
+    int ConsProdS = sem_create(ConsProdC, M),
         ConsS = sem_create(ConsC, 0);
     printf("    Création des sémaphores :  ConsProdS : %d | ConsS : %d\n", ConsProdS, ConsS);
     // CreationDesSemaphores

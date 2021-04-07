@@ -70,6 +70,7 @@ void msg_delete(const int msgid)
         exit(1);
     }
 }
+
 char *msg_recieve(const int msgid, const long mtype)
 {
     msgtext buf;
@@ -85,6 +86,7 @@ char *msg_recieve(const int msgid, const long mtype)
     //printf("\"%s\" longeur %d de type %ld est recu depuis %d\n", buf.mtexte, lg, buf.mtype, msgid);
     return message;
 }
+
 void msg_send(const int msgid, const long mtype, const char *message)
 {
     msgtext buf;
@@ -98,6 +100,7 @@ void msg_send(const int msgid, const long mtype, const char *message)
     /*else
         printf("%s de type %ld envoye a %d\n", buf.mtexte, buf.mtype, msgid);*/
 }
+
 void msg_State(const int msgid)
 {
     msqid_ds buf;
