@@ -71,35 +71,6 @@ void shm_dettatch(const char *mem)
     if (shmdt(mem) == -1)
         perror("Détachement impossible");
 }
-char *shm_read(const int shmid)
-{
-    char *mem, *cpy = NULL;
-    if ((mem = shmat(shmid, 0, 0)) == (char *)-1)
-        perror("Attachement impossible pendant la lecture");
-    else
-    {
-        cpy = strdup(mem);
-        if (shmdt(mem) == -1)
-            perror("Détachement impossible pendant la lecture");
-    }
-    return cpy;
-}
-
-void shm_change(const int shmid, const char *tochange)
-{
-    char *mem;
-    if ((mem = shmat(shmid, 0, 0)) == (char *)-1)
-    {
-        perror("Attachement impossible en changemant");
-    }
-    else
-    {
-        strcpy(mem, tochange);
-        printf("\tMémoire partagée est remplacée par : %s\n", mem);
-        if (shmdt(mem) == -1)
-            perror("Détachement impossible pendant la lecture");
-    }
-}
 
 void shm_State(const int shmid)
 {

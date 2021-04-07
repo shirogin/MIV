@@ -11,13 +11,12 @@
 // printing
 
 // SymaphoreCles
-#define ProdC 1
 #define ConsProdC 2
 #define ConsC 3
 // SymaphoreCles
 
 // MemoirePartageeCles
-#define SHM_T_Cle 200
+#define SHM_T_Cle 20
 // MemoirePartageeCles
 
 // MessagesCles
@@ -30,21 +29,21 @@
 // PreDefinition
 
 // DefinitionDesProcessus
-void ProdF(const int FileMess, const int ProdS)
+void ProdF(const int FileMess)
 {
     int i = 1;
     char temp[12];
     while (i <= N)
     {
-        printf("    Processus Prod : Genrate %d and \n\n", i);
-        sprintf(temp, "%d", i);
+        sprintf(temp, "message %d", i);
         msg_send(FileMess, N, temp);
+        printf("    Processus Prod : Genrer %d & l'envoye  \n\n", i);
         //sleep(1);
         i++;
     }
     exit(0);
 }
-void ConsProdF(const int FileMess, const int T, const int ProdS, const int ConsProdS, const int ConsS)
+void ConsProdF(const int FileMess, const int T, const int ConsProdS, const int ConsS)
 {
     int i = 1, j = 1;
     char *temp;
@@ -52,7 +51,7 @@ void ConsProdF(const int FileMess, const int T, const int ProdS, const int ConsP
     while (i <= N)
     {
         temp = msg_recieve(FileMess, N);
-        printf("    Processus ConsProd : %s\n\n", temp);
+        printf("    Processus ConsProd : Message est recu '%s'\n\n", temp);
         P(ConsProdS);
         tab[(i - 1) % M] = i;
         V(ConsS);
@@ -71,7 +70,7 @@ void ConsF(const int T, const int ConsProdS, const int ConsS)
         P(ConsS);
         printf("    Processus ConsF :    Message afficher '%d'\n\n", tab[(i - 1) % M]);
         i++;
-        sleep(5);
+        //sleep(2);
         V(ConsProdS);
     }
     shm_dettatch((char *)tab);
@@ -84,23 +83,22 @@ int main()
 
     // CreationDesSemaphores
     Seprate;
-    int ProdS = sem_create(ProdC, 0),
-        ConsProdS = sem_create(ConsProdC, M - 1),
+    int ConsProdS = sem_create(ConsProdC, M - 1),
         ConsS = sem_create(ConsC, 0);
-    printf("    Création des sémaphores : ProdS : %d | ConsProdS : %d | ConsS : %d\n", ProdS, ConsProdS, ConsS);
+    printf("    Création des sémaphores :  ConsProdS : %d | ConsS : %d\n", ConsProdS, ConsS);
     // CreationDesSemaphores
 
     // CreationDesMemoirePartagee
     Seprate;
     printf("Création des Mémoire Partagée : \n");
-    int T = shm_create(SHM_T_Cle, 40 * M);
+    int T = shm_create(SHM_T_Cle, sizeof(int) * M);
     printf("\t  Memoire partagée pour controle de T : %d\n", T);
     // CreationDesMemoirePartagee
 
     // CreationDeLaFilesDesMessage
     Seprate;
     int FileMess = msg_create(MSG_FileMess_Cle);
-    printf("    Création des files des messages :  FileMess: %d \n", FileMess);
+    printf("    Création la file des messages :  FileMess: %d \n", FileMess);
     Seprate;
     // CreationDesFilesDesMessage
 
@@ -111,13 +109,13 @@ int main()
     // ProcessusProd
     pid_t ProdPID = fork();
     if (ProdPID == 0)
-        ProdF(FileMess, ProdS);
+        ProdF(FileMess);
     // ProcessusProd
 
     // ProcessusConsProd
     pid_t ConsProdPID = fork();
     if (ConsProdPID == 0)
-        ConsProdF(FileMess, T, ProdS, ConsProdS, ConsS);
+        ConsProdF(FileMess, T, ConsProdS, ConsS);
     // ProcessusConsProd
 
     // ProcessusCons
@@ -157,7 +155,6 @@ int main()
     // SuppressionDesSemaphores
     Seprate;
     printf("    Suppression des sémaphores");
-    sem_delete(ProdS);
     sem_delete(ConsProdS);
     sem_delete(ConsS);
     // SuppressionDesSemaphores
