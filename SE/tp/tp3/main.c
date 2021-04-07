@@ -35,7 +35,7 @@ void ProdF(const int FileMess)
     char temp[12];
     while (i <= N)
     {
-        sprintf(temp, "message %d", i);
+        sprintf(temp, "%d", i);
         msg_send(FileMess, N, temp);
         printf("    Processus Prod : Genrer %d & l'envoye  \n\n", i);
         //sleep(1);
@@ -57,7 +57,6 @@ void ConsProdF(const int FileMess, const int T, const int ConsProdS, const int C
         V(ConsS);
         i++;
     }
-    shm_dettatch((char *)tab);
     exit(0);
 }
 void ConsF(const int T, const int ConsProdS, const int ConsS)
@@ -68,9 +67,9 @@ void ConsF(const int T, const int ConsProdS, const int ConsS)
     while (i <= N)
     {
         P(ConsS);
-        printf("    Processus ConsF :    Message afficher '%d'\n\n", tab[(i - 1) % M]);
+        printf("    Processus Cons :    Message afficher '%d'\n\n", tab[(i - 1) % M]);
         i++;
-        //sleep(2);
+        sleep(2);
         V(ConsProdS);
     }
     shm_dettatch((char *)tab);

@@ -47,7 +47,7 @@ void P(semid) int semid;
     struct sembuf sempar;
     sempar.sem_num = 0;
     sempar.sem_op = -1;
-    sempar.sem_flg = SEM_UNDO;
+    sempar.sem_flg = 0;
     if (semop(semid, &sempar, 1) == -1)
         perror("Erreur operation P");
 }
@@ -56,7 +56,7 @@ void V(semid) int semid;
     struct sembuf sempar;
     sempar.sem_num = 0;
     sempar.sem_op = 1;
-    sempar.sem_flg = SEM_UNDO;
+    sempar.sem_flg = 0;
     if (semop(semid, &sempar, 1) == -1)
         perror("Erreur operation V");
 }
