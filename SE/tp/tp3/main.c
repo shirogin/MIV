@@ -36,10 +36,10 @@ void ProdF(const int FileMess, const int ProdS)
     char temp[12];
     while (i <= N)
     {
-        printf("    Processus Prod : Genrate %d and \n", i);
+        printf("    Processus Prod : Genrate %d and \n\n", i);
         sprintf(temp, "%d", i);
         msg_send(FileMess, N, temp);
-        V(ProdS);
+        //sleep(1);
         i++;
     }
     exit(0);
@@ -49,20 +49,15 @@ void ConsProdF(const int FileMess, const int T, const int ProdS, const int ConsP
     int i = 1, j = 1;
     char *temp;
     int *tab = (int *)shm_attatch(T);
-    printf("ConsProd est Blocke %d\n", ProdS);
     while (i <= N)
     {
-        P(ProdS);
-        sem_State(ProdS);
-        printf("    Processus ConsProd : %d\n", i);
         temp = msg_recieve(FileMess, N);
-        printf("    Processus ConsProd : blocke M \n", (i - 1) % M);
+        printf("    Processus ConsProd : %s\n\n", temp);
         P(ConsProdS);
         tab[(i - 1) % M] = i;
         V(ConsS);
         i++;
     }
-    V(ConsS);
     shm_dettatch((char *)tab);
     exit(0);
 }
@@ -71,16 +66,12 @@ void ConsF(const int T, const int ConsProdS, const int ConsS)
     int i = 1;
     int *tab = (int *)shm_attatch(T);
     char *temp;
-    printf("Cons est Blocke %d\n", ConsS);
     while (i <= N)
     {
         P(ConsS);
-        printf("    Processus ConsF : ");
-        printf("    Message afficher '%d'\n", tab[(i - 1) % M]);
+        printf("    Processus ConsF :    Message afficher '%d'\n\n", tab[(i - 1) % M]);
         i++;
-        //        sleep(1);
-        printf("    Processus ConsF : ");
-        printf("Libere index %d de M\n", (i - 1) % M);
+        sleep(5);
         V(ConsProdS);
     }
     shm_dettatch((char *)tab);

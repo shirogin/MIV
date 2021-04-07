@@ -75,14 +75,14 @@ char *msg_recieve(const int msgid, const long mtype)
     msgtext buf;
     buf.mtype = mtype;
     int lg;
-    if ((lg = msgrcv(msgid, &buf, MSG_SIZE_TEXT, mtype, IPC_NOWAIT | MSG_NOERROR)) == -1)
+    if ((lg = msgrcv(msgid, &buf, MSG_SIZE_TEXT, mtype, MSG_NOERROR)) == -1)
     {
         perror("Pas de message");
         return NULL;
     }
     char *message = (char *)malloc(sizeof(char) * lg);
     sscanf(buf.mtexte, MSG_TO_Buffer, message);
-    printf("\"%s\" longeur %d de type %ld est recu depuis %d\n", buf.mtexte, lg, buf.mtype, msgid);
+    //printf("\"%s\" longeur %d de type %ld est recu depuis %d\n", buf.mtexte, lg, buf.mtype, msgid);
     return message;
 }
 void msg_send(const int msgid, const long mtype, const char *message)
@@ -90,13 +90,13 @@ void msg_send(const int msgid, const long mtype, const char *message)
     msgtext buf;
     buf.mtype = mtype;
     sprintf(buf.mtexte, MSG_TO_Buffer, message);
-    if (msgsnd(msgid, &buf, strlen(buf.mtexte) + 1, IPC_NOWAIT) == -1)
+    if (msgsnd(msgid, &buf, strlen(buf.mtexte) + 1, 0) == -1)
     {
         perror("impossible d'envoyer le message");
         exit(-1);
     }
-    else
-        printf("%s de type %ld envoye a %d\n", buf.mtexte, buf.mtype, msgid);
+    /*else
+        printf("%s de type %ld envoye a %d\n", buf.mtexte, buf.mtype, msgid);*/
 }
 void msg_State(const int msgid)
 {
