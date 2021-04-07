@@ -57,7 +57,20 @@ void shm_delete(const int shmid)
         exit(1);
     }
 }
-
+char *shm_attatch(const int shmid)
+{
+    char *mem = NULL;
+    if ((mem = shmat(shmid, 0, 0)) == (char *)-1)
+    {
+        perror("Attachement impossible en changemant");
+    }
+    return mem;
+}
+void shm_dettatch(const char *mem)
+{
+    if (shmdt(mem) == -1)
+        perror("Détachement impossible");
+}
 char *shm_read(const int shmid)
 {
     char *mem, *cpy = NULL;
@@ -72,13 +85,6 @@ char *shm_read(const int shmid)
     return cpy;
 }
 
-int shm_readInt(const int shmid)
-{
-    char *r = shm_read(shmid);
-    if (r == NULL)
-        return -1;
-    return atoi(r);
-}
 void shm_change(const int shmid, const char *tochange)
 {
     char *mem;
@@ -89,23 +95,12 @@ void shm_change(const int shmid, const char *tochange)
     else
     {
         strcpy(mem, tochange);
-        printf("Mémoire partagée remplacée par : %s\n", mem);
+        printf("\tMémoire partagée est remplacée par : %s\n", mem);
         if (shmdt(mem) == -1)
             perror("Détachement impossible pendant la lecture");
     }
 }
-void shm_changeInt(const int shmid, const int tochange)
-{
-    char tochangeS[12];
-    sprintf(tochangeS, "%d", tochange);
-    shm_change(shmid, strdup(tochangeS));
-}
-int shm_createV(const int cle, const int size, const int initial)
-{
-    int shmid = shm_create(cle, size);
-    shm_changeInt(shmid, initial);
-    return shmid;
-}
+
 void shm_State(const int shmid)
 {
     sh_Buffer buf;

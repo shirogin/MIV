@@ -1,8 +1,6 @@
 #include <sys/sem.h>
 #include <sys/errno.h>
 
-
-
 /*
 *   Implementation des semaphores de Dijkstra a l'aide des semaphores de SystemV.
 *   sem_create(): creation d'un semaphore
@@ -13,11 +11,11 @@
 */
 
 int sem_create(cle, initval)
-/* creation d'un semaphore relie a cle */
-/* de valeur initiale initval
+    /* creation d'un semaphore relie a cle */
+    /* de valeur initiale initval
 */
-key_t cle ;
-int initval ;
+    key_t cle;
+int initval;
 {
     int semid;
     union semun
@@ -62,8 +60,30 @@ void V(semid) int semid;
     if (semop(semid, &sempar, 1) == -1)
         perror("Erreur operation V");
 }
-void sem_delete(semid) int semid;
+
+void sem_delete(int semid)
 {
     if (semctl(semid, 0, IPC_RMID, 0) == -1)
         perror("Erreur dans destruction semaphore");
+}
+void sem_State(const int semid)
+{
+    struct semid_ds buf;
+    if (semctl(semid, 0, IPC_STAT, &buf) == -1)
+    {
+        perror("Erreur semctl()");
+        exit(1);
+    }
+    else
+    {
+        printf(" ------------------------------------------------------------ \n");
+        printf("|   ETAT DU SEGMENT DE MEMOIRE PARTAGEE %.9d            |\n", semid);
+        printf("|   Identificateur de l'utilisateur proprietaire: %.9d  |\n", buf.sem_perm.uid);
+        printf("|   Identificateur du groupe proprietaire: %.9d         |\n", buf.sem_perm.gid);
+        printf("|   Identificateur de l'utilisateur createur: %.9d      |\n", buf.sem_perm.cuid);
+        printf("|   Identificateur du groupe createur: %.9d             |\n", buf.sem_perm.cgid);
+        printf("|   Mode d'acces: %.9d                                  |\n", buf.sem_perm.mode);
+        printf("|   number of semaphores in set: %.9ld                     |\n", buf.sem_nsems);
+        printf(" ------------------------------------------------------------\n");
+    }
 }
