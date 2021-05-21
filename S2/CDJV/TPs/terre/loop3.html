@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title > Dessin d'images</title>
+
+</head>
+
+<body>
+<!Creating a Canvas Element>
+<canvas width = "300" height = "300" id = "idcanvas" style = "border:black 1px solid;">
+Your browser does not support HTML5 Canvas. Please shift to another browser.
+</canvas>
+
+
+<script type = "text/javascript" charset = "utf-8">
+
+//Une fois l'image chargée, on peut la dessiner.
+var earth = new Image();
+var d=0; 
+var m=1;
+var delay=1000/60;
+earth.src = 'Canvas_earth.png';
+draw();
+
+function draw() {
+var ctx = document.getElementById('idcanvas').getContext('2d');
+ctx.globalCompositeOperation = 'destination-over';
+ctx.clearRect(0,0,300,300); // effacer le canvas
+ctx.drawImage(earth,12+d,12+d);
+d=d+m; if((d>280)||(d<0)) m=-m;
+setTimeout(draw, delay); 
+}
+
+
+</script>
+</body>
+</html>
