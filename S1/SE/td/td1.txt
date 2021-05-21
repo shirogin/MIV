@@ -1,0 +1,78 @@
+-Excerice 1:
+    *G1
+    // fork
+    Debut
+        n3=3
+        n4=4
+        fork et5
+        fork et1
+        fork et2
+        fork et6
+        T7; aller a et4;
+
+
+        et5:T5; aller a et3;
+        et1:T1; fork et4; aller a et3;
+        et2:T2; fork et3 aller a et4;
+        et6:T6; aller a et4;
+
+        et3: join n3; T3;
+        et4: join n4; T4;
+    Fin
+
+    *G2
+    
+    *G3
+    Debut
+        T1;
+        ParBegin 
+            Debut
+                T2;
+                ParBegin
+                    Debut
+                        T5;
+                    Fin
+                    Debut
+                        T4;
+                    Fin
+                ParEnd
+                T7;
+            Fin
+            Debut
+                T3;
+                T6;
+                T8;
+            Fin
+        ParEnd
+        T9
+    Fin
+    *G4
+    Debut
+        ParBegin
+            Debut
+                ParBegin 
+                    Debut
+                        T1;
+                        ParBegin
+                            Debut
+                                T5;
+                            Fin
+                            Debut
+                                T4;
+                            Fin
+                        ParEnd
+                    Fin
+                    Debut
+                        T2;
+                    Fin
+                ParEnd
+                T6;
+            Fin
+            Debut
+                T3;
+            Fin
+        ParEnd
+        T7
+    Fin
+-Excerice 3:
+    

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Document</title>
+    <style>
+        #Main{
+            background-color: gray;
+        }
+    </style>
+</head>
+<body>
+    <canvas width="1000" height="600" id="Main">
+
+    </canvas>
+    <script>
+        let canvas=document.getElementById("Main"),
+        ctx = canvas.getContext("2d");
+        if(!ctx) alert("Upgrade your browser")
+        else Start(ctx)
+        function Start(ctx){
+            ctx.strokeStyle = "#FF0000";
+            ctx.strokeRect(60, 60, 360, 360);
+            for (let x = 1; x <= 6; x++) {
+                for (let y = 1; y <= 6; y++) {
+                    ctx.fillStyle=`rgb(${255-y*32},${255-x*32},${0})`
+                    ctx.fillRect(x*60,y*60,60,60)
+                    ctx.beginPath();
+                    ctx.strokeStyle="rgb(50,50,0)"
+                    ctx.lineWidth = 5;
+                    ctx.arc(x*60+30,y*60+30,25,0,2*Math.PI)
+                    ctx.stroke();
+
+
+                }   
+            }
+            line(ctx,0,[205,205,0])
+            line(ctx,1,[0,205,0])
+            line(ctx,2,[205,0,0])
+            line(ctx,3,[0,0,205])
+            
+        }
+        function colorMax(byte,step){
+            return (255-byte)/10*step+byte;
+        }
+        function line(ctx,x,color){
+            ctx.strokeStyle = `rgb(${color[0]},${color[1]},${color[2]})`
+            ctx.strokeRect(580, x*90+60, 360, 85);
+            for (let y = 0; y < 10; y++) {
+                ctx.fillStyle=`rgb(${colorMax(color[0],y)},${colorMax(color[1],y)},${colorMax(color[2],y)})`
+                ctx.fillRect(y*36+580,x*90+60,36,85)
+            }  
+        }
+    </script>
+</body>
+</html>
