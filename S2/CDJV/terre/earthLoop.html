@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sun ,Earth and Moon</title>
+  </head>
+
+  <body>
+    <!Creating a Canvas Element>
+    <canvas
+      width="300"
+      height="300"
+      id="idcanvas"
+      style="border: black 1px solid"
+    >
+      Your browser does not support HTML5 Canvas. Please shift to another
+      browser.
+    </canvas>
+
+    <script type="text/javascript" charset="utf-8">
+
+      var Earth = {
+        image: new Image(),
+        d: 100,
+        angle: 0,
+        w:10,
+        h:10
+      },
+      Sun={
+          image: new Image(),
+          x:140,y:140
+      },
+      Moon={
+        image:new Image(),
+        d:25,
+        angle:0,
+        w:7,
+        h:7
+      },
+      Speed=0.005;
+
+      Earth.image.src = "Canvas_earth.png";
+      Sun.image.src="Canvas_sun.png";
+      Moon.image.src="Canvas_moon.png";
+      draw();
+
+      function draw() {
+        var ctx = document.getElementById("idcanvas").getContext("2d");
+        ctx.clearRect(0, 0, 300, 300); // effacer le canvas
+        ctx.drawImage(Sun.image, 0, 0);
+        Earth={
+            ...Earth,
+            x:Earth.d*Math.cos(Earth.angle) + Sun.x ,
+            y:Earth.d*Math.sin(Earth.angle) + Sun.y 
+        }
+        ctx.arc(150,150,100,0,Math.PI*2);
+        ctx.strokeStyle = "#fff";
+        ctx.stroke();
+        ctx.drawImage(Earth.image, Earth.x- (Earth.w/2) , Earth.y - (Earth.h/2));
+        Moon={
+            ...Moon,
+            x:Moon.d*Math.cos(Moon.angle) + Earth.x +(Moon.w/2),
+            y:Moon.d*Math.sin(Moon.angle) + Earth.y + (Moon.h/2),
+        }
+        ctx.drawImage(Moon.image, Moon.x, Moon.y);
+        Earth.angle+=Speed;
+        Moon.angle+=Speed*12;
+        if (Earth.angle >= 360 ) Earth.angle=0;
+        window.requestAnimationFrame(draw);
+      }
+    </script>
+  </body>
+</html>

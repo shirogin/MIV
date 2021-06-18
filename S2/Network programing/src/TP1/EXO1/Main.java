@@ -1,6 +1,4 @@
-package TP1;
-
-import java.io.FileNotFoundException;
+package TP1.EXO1;
 
 public class Main {
     static public void main(String[] args) {

@@ -1,4 +1,4 @@
-package TP1;
+package TP1.EXO1;
 
 import java.io.*;
 

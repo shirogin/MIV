@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Project 1</title>
+        <style>
+            body {
+                background-color: lightsalmon;
+                display: flex;
+                margin: 0;
+                flex-direction: column;
+                width: 100vw;
+                height: 100vh;
+                font-family: "Open Sans", sans-serif;
+                font-weight: 700;
+                text-transform: uppercase;
+            }
+            div {
+                display: flex;
+            }
+            h2,
+            h1 {
+                margin: auto;
+            }
+            h1 {
+                font-size: 4rem;
+            }
+
+            #canv {
+                margin: auto;
+                background-color: lightsteelblue;
+                transform: rotate(180deg) scaleX(-1);
+
+                border: black solid 1px;
+                border-radius: 0.2em;
+                overflow: hidden;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h1>breakout</h1>
+        <div>
+            <h2>Max score: <span id="Max">0</span></h2>
+            <h2>Current score: <span id="Current">0</span></h2>
+        </div>
+        <canvas id="canv"> </canvas>
+        <script>
+            const canvas = document.getElementById("canv"),
+                max = document.getElementById("Max"),
+                current = document.getElementById("Current"),
+                ctx = canvas.getContext("2d");
+            canvas.width = 1150;
+            canvas.height = 600;
+            function valueInRange(value, min, max) {
+                return value >= min && value <= max;
+            }
+            class object {
+                position;
+                render;
+                collider = {
+                    isColliding: false,
+                };
+                constructor(render) {
+                    if (render instanceof Object) {
+                        var {
+                            fill = "#f8e006",
+                            collide = "#282Fe6",
+                            stroke = "#00000000",
+                            enable = true,
+                            image,
+                        } = render;
+                        if (render.image) {
+                            image = new Image();
+                            image.src = render.image;
+                        }
+                    } else
+                        var fill = "#f8e006",
+                            collide = "#282Fe6",
+                            stroke = "#00000000",
+                            enable = true,
+                            image = new Image();
+
+                    this.render = { fill, collide, stroke, enable, image };
+                }
+            }
+            class rect extends object {
+                width;
+                height;
+                constructor(width = 100, height = 100, position, render) {
+                    super(render);
+                    this.width = width;
+                    this.height = height;
+                    if (position instanceof Object) {
+                        var { x = 0, y = 0 } = position;
+                    } else
+                        var x = 0,
+                            y = 0;
+                    this.position = {
+                        x:
+                            x === Infinity
+                                ? canvas.width / 2 - this.width / 2
+                                : x,
+                        y:
+                            y === Infinity
+                                ? canvas.height / 2 - this.height / 2
+                                : y,
+                    };
+                }
+                draw() {
+                    ctx.beginPath();
+
+                    if (this.render.image) {
+                        ctx.drawImage(
+                            this.render.image,
+                            this.position.x,
+                            this.position.y,
+                            this.width,
+                            this.height
+                        );
+                    } else {
+                        ctx.rect(
+                            this.position.x,
+                            this.position.y,
+                            this.width,
+                            this.height
+                        );
+                        ctx.fillStyle = this.render.fill;
+                        ctx.fill();
+                        ctx.strokeStyle = this.render.stroke;
+                        ctx.stroke();
+                    }
+                    ctx.closePath();
+                }
+            }
+            class Enemy extends rect {
+                static enemies = [];
+                points;
+                constructor(width, height, position, points) {
+                    super(width, height, position, {
+                        //fill: "#F5" + points.toString(16) + "0f",
+                        image:
+                            points > 220
+                                ? "star.png"
+                                : "bricks/" + Math.ceil(points / 22) + ".png",
+                    });
+                    this.points = points;
+                    Enemy.enemies.push(this);
+                }
+                destroy() {
+                    Enemy.enemies = Enemy.enemies.filter((elm) => elm !== this);
+                    GameManager.scoreChange(this.points);
+                    delete this;
+                }
+            }
+            class Character extends rect {
+                speed = 0;
+                accelerator = 5;
+                timeMoving = 0;
+                maxSpeed;
+                constructor(width, height, position, speed, render) {
+                    super(width, height, position, render);
+                    this.maxSpeed = speed;
+                }
+
+                move(keyState, deltaTime) {
+                    if (keyState[37] ^ keyState[39]) {
+                        this.timeMoving += deltaTime;
+                        this.speed =
+                            (1 -
+                                Math.exp(-this.timeMoving * this.accelerator)) *
+                            this.maxSpeed;
+                        if (keyState[37]) this.speed *= -1;
+                    } else {
+                        this.timeMoving = 0;
+                        this.speed = 0;
+                    }
+
+                    this.position.x += this.speed * deltaTime;
+                    if (this.position.x < 0) this.position.x = 0;
+                    if (this.position.x + this.width > canvas.width)
+                        this.position.x = canvas.width - this.width;
+                }
+            }
+            class Ball extends object {
+                vector;
+                speed;
+                radius;
+                constructor(radius = 20, vector, speed, position, render) {
+                    super(render);
+                    this.radius = radius;
+                    this.speed = speed;
+                    if (position instanceof Object)
+                        var { x = 0, y = 0 } = position;
+                    else
+                        var x = 0,
+                            y = 0;
+                    this.position = {
+                        x: x === Infinity ? canvas.width / 2 : x,
+                        y: y === Infinity ? canvas.height / 2 : y,
+                    };
+                    if (vector instanceof Object) var { x = 0, y = 0 } = vector;
+                    else
+                        var x = 0,
+                            y = 0;
+                    this.vector = { x, y };
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(
+                        this.position.x,
+                        this.position.y,
+                        this.radius,
+                        0,
+                        Math.PI * 2
+                    );
+                    ctx.fillStyle = this.collider.isColliding
+                        ? this.render.collide
+                        : this.render.fill;
+                    ctx.fill();
+                    ctx.strokeStyle = this.render.stroke;
+                    ctx.stroke();
+                    ctx.closePath();
+                }
+                move(deltaTime) {
+                    this.position.x += this.vector.x * this.speed * deltaTime;
+                    this.position.y += this.vector.y * this.speed * deltaTime;
+                    if (this.position.y < paddle.position.y + paddle.height / 2)
+                        return (GameManager.gameOver = true);
+                    let status = {
+                        before: this.collider.isColliding,
+                        a: this.position.y + this.radius > canvas.height,
+                        b: this.position.x - this.radius < 0,
+                        c: this.position.x + this.radius > canvas.width,
+                    };
+                    if (!this.collider.isColliding) {
+                        if (status.a) this.collision({ y: -1 });
+                        else if (status.b) this.collision({ x: 1 });
+                        else if (status.c) this.collision({ x: -1 });
+                    } else {
+                        if (!status.a && !status.b && !status.c)
+                            this.collider.isColliding = false;
+                    }
+                }
+                collision({ x, y }, speed = 0) {
+                    this.speed = Math.max(
+                        Math.min(ball.speed + speed, GameManager.speed.max),
+                        GameManager.speed.min
+                    );
+                    if (x) this.vector.x = Math.abs(this.vector.x) * x;
+                    if (y) this.vector.y = Math.abs(this.vector.y) * y;
+                    this.collider.isColliding = true;
+                }
+                collide(rect) {
+                    let before = this.collider.isColliding,
+                        circleDistance = {
+                            x: Math.abs(
+                                this.position.x -
+                                    (rect.position.x + rect.width / 2)
+                            ),
+                            y: Math.abs(
+                                this.position.y -
+                                    (rect.position.y + rect.height / 2)
+                            ),
+                        };
+
+                    if (circleDistance.x > rect.width / 2 + this.radius)
+                        return (this.collider.isColliding = false);
+                    if (circleDistance.y > rect.height / 2 + this.radius)
+                        return (this.collider.isColliding = false);
+
+                    if (circleDistance.x <= rect.width / 2) {
+                        this.collider.isColliding = true;
+                    } else if (circleDistance.y <= rect.height / 2) {
+                        this.collider.isColliding = true;
+                    } else {
+                        let cornerDistance_sq =
+                            (circleDistance.x - rect.width / 2) ** 2 +
+                            (circleDistance.y - rect.height / 2) ** 2;
+                        this.collider.isColliding =
+                            cornerDistance_sq <= this.radius ** 2;
+                    }
+
+                    if (!before && this.collider.isColliding) {
+                        let angle = Math.atan2(
+                            this.position.y -
+                                (rect.position.y + rect.height / 2),
+                            this.position.x - (rect.position.x + rect.width / 2)
+                        );
+                        if (rect === paddle)
+                            this.speed = Math.max(
+                                Math.min(
+                                    this.speed + Math.abs(rect.speed / 3),
+                                    GameManager.speed.max
+                                ),
+                                GameManager.speed.min
+                            );
+                        else rect.destroy();
+                        this.vector = {
+                            x: Math.cos(angle),
+                            y: Math.sin(angle),
+                        };
+                    }
+                }
+            }
+            function createEnemies() {
+                let width = (canvas.width - 60 * GameManager.enemies[0]) / 2;
+                for (let y = 0; y < GameManager.enemies[1]; y++) {
+                    for (let i = 0; i < GameManager.enemies[0]; i++) {
+                        new Enemy(
+                            40,
+                            40,
+                            {
+                                x: i * 60 + width,
+                                y: canvas.height + 50 * y - 50,
+                            },
+                            Math.floor(Math.random() * 255)
+                        );
+                    }
+                }
+            }
+
+            let paddle = new Character(180, 30, { x: Infinity, y: 20 }, 300, {
+                    image: "paddle.png",
+                }),
+                ball = new Ball(
+                    10,
+                    { x: 0, y: -1 },
+                    150,
+                    { x: Infinity, y: Infinity },
+                    { image: "ball.png" }
+                );
+            class GameManager {
+                static keyState = {};
+                static oldTime = 0;
+                static oldCount = 0;
+                static gameOver = false;
+                static gameWon = false;
+                static maxScore = Number(
+                    window.localStorage.getItem("max") || 0
+                );
+                static score = 0;
+                static enemies = [9, 3];
+                static speed = {
+                    max: 380,
+                    min: 200,
+                };
+                static enemiesSpeed = 4;
+                static init() {
+                    max.innerHTML = this.maxScore;
+                }
+                static scoreChange(s) {
+                    this.score += s;
+                    if (this.score > this.maxScore) {
+                        this.maxScore = this.score;
+                        max.innerHTML = this.maxScore;
+                    }
+                    current.innerText = this.score;
+                }
+            }
+            GameManager.init();
+            createEnemies();
+            window.requestAnimationFrame(update);
+            window.addEventListener(
+                "keydown",
+                function (e) {
+                    if (e.keyCode === 37 || e.keyCode === 39) {
+                        GameManager.keyState[e.keyCode || e.which] = true;
+                        e.preventDefault();
+                    }
+                },
+                true
+            );
+            window.addEventListener(
+                "keyup",
+                function (e) {
+                    if (e.keyCode === 37 || e.keyCode === 39) {
+                        GameManager.keyState[e.keyCode || e.which] = false;
+                        e.preventDefault();
+                    }
+                },
+                true
+            );
+
+            function update(timeStamp) {
+                let deltaTime = (timeStamp - GameManager.oldTime) / 1000;
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (GameManager.gameOver) {
+                    ctx.font = '70px "Comic Sans MS"';
+                    ctx.beginPath();
+                    ctx.rotate(Math.PI);
+                    ctx.scale(-1, 1);
+                    ctx.fillStyle = "#040507";
+                    if (GameManager.gameWon)
+                        ctx.fillText(
+                            "You finished the Game",
+                            canvas.width / 2 - 350,
+                            -canvas.height / 2
+                        );
+                    else
+                        ctx.fillText(
+                            "Game Over",
+                            canvas.width / 2 - 150,
+                            -canvas.height / 2
+                        );
+                    ctx.closePath();
+                    window.localStorage.setItem("max", GameManager.maxScore);
+                    setTimeout(() => {
+                        location.reload();
+                    }, 3000);
+                    return;
+                }
+                ball.collide(paddle);
+                if (Enemy.enemies.length > 0)
+                    Enemy.enemies.forEach((elm) => {
+                        elm.position.y -= GameManager.enemiesSpeed * deltaTime;
+                        if (
+                            elm.position.y <
+                            paddle.position.y + paddle.height / 2
+                        )
+                            GameManager.gameOver = true;
+                        elm.draw();
+                        ball.collide(elm);
+                    });
+                else {
+                    GameManager.gameOver = true;
+                    GameManager.gameWon = true;
+                }
+                paddle.move(GameManager.keyState, deltaTime);
+                paddle.draw();
+                ball.move(deltaTime);
+                ball.draw();
+                GameManager.oldTime = timeStamp;
+                window.requestAnimationFrame(update);
+            }
+        </script>
+    </body>
+</html>

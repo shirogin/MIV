@@ -1,10 +1,9 @@
-package TP2;
+package TP1.EXO2;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -24,11 +23,6 @@ public class FileShow extends Application {
             primaryStage.setScene(scene);
             primaryStage.initStyle(StageStyle.TRANSPARENT);
             primaryStage.setTitle("Show file");
-            /*
-            * scene.setFill(Color.TRANSPARENT);
-            * scene.getStylesheets().add(getClass().getResource("/sample/style.css").toExternalForm());
-            * primaryStage.getIcons().add(new Image("/logo.png"));
-            */
             primaryStage.show();
 
         } catch (IOException e) {

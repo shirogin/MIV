@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="TP1.EXO2.FileShowController">
+   <children>
+      <ScrollPane layoutX="123.0" layoutY="113.0">
+         <content>
+            <TextArea fx:id="text" prefHeight="200.0" prefWidth="354.0" />
+         </content>
+      </ScrollPane>
+      <FlowPane alignment="CENTER" layoutX="152.0" layoutY="322.0" prefHeight="64.0" prefWidth="297.0">
+         <children>
+            <Button fx:id="openButton" mnemonicParsing="false" onAction="#open" text="Open File">
+               <FlowPane.margin>
+                  <Insets right="10.0" />
+               </FlowPane.margin>
+            </Button>
+            <Button fx:id="closeButton" mnemonicParsing="false" onAction="#exit" text="Exit" />
+         </children>
+      </FlowPane>
+   </children>
+</AnchorPane>

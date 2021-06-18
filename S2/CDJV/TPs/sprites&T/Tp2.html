@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Sun ,Earth and Moon</title>
+</head>
+
+<body>
+    <!Creating a Canvas Element>
+        <canvas width="300" height="300" id="idcanvas" style="border: black 1px solid">
+            Your browser does not support HTML5 Canvas. Please shift to another
+            browser.
+        </canvas>
+
+        <script type="text/javascript" charset="utf-8">
+
+            var Cog = {
+                image: new Image(),
+                x: 100, y: 100,
+
+            };
+            Cog.image.src = "cog.png";
+
+
+            var canvas = document.getElementById("idcanvas");
+            var ctx = canvas.getContext("2d");
+
+            window.requestAnimationFrame(draw);
+            var old = 0;
+
+            function draw(timestemp) {
+                // console.log(timestemp);
+                var delta = timestemp - old;
+                ctx.clearRect(0, 0, 300, 300);
+                ctx.drawImage(Cog.image, Cog.x, Cog.y);
+                window.requestAnimationFrame(draw);
+            }
+        </script>
+</body>
+
+</html>

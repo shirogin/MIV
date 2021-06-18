@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Tp 3</title>
+</head>
+
+<body>
+    <!Creating a Canvas Element>
+        <canvas width="1280" height="640" id="idcanvas" style="border: black 1px solid">
+            Your browser does not support HTML5 Canvas. Please shift to another
+            browser.
+        </canvas>
+
+        <script type="text/javascript" charset="utf-8">
+            class Tile {
+                map;
+                image;
+                position = { x: 0, y: 0 };
+                width;
+                height;
+                constructor(image, { x = 1, y = 1 }, width, height) {
+                    this.map = { x, y };
+                    this.image = image;
+                    this.width = width;
+                    this.height = height;
+                }
+                draw(width = this.width, height = this.height) {
+                    GameManager.ctx.beginPath()
+                    GameManager.ctx.drawImage(this.image, this.map.x, this.map.y, this.width, this.height,
+                        this.position.x, this.position.y, width, height);
+                    GameManager.ctx.closePath()
+                }
+            }
+            class TileMap {
+                Tiles = [];
+                map;
+                src;
+                image = new Image();
+                constructor(src, { x = 1, y = 1 }, Map) {
+                    this.map = { x, y };
+                    this.src = src;
+                    this.image.src = src;
+                    let $this = this;
+                    Map.forEach((row, y) => {
+                        row.forEach((col, x) => {
+
+                            if (col < 3) {
+                                let tile = $this.createTile(col)
+                                tile.position = {
+                                    x: tile.width * x,
+                                    y: tile.height * y
+                                }
+                                this.Tiles.push(tile)
+                            }
+                            else {
+                                let tile = $this.createTile(col % 10);
+                                this.Tiles.push(tile)
+                                tile.position = {
+                                    x: tile.width * x,
+                                    y: tile.height * y
+                                }
+
+                                tile = $this.createTile(Math.floor(col / 10))
+                                tile.position = {
+                                    x: tile.width * x,
+                                    y: tile.height * y
+                                }
+                                this.Tiles.push(tile)
+                            }
+
+                        })
+                    })
+                }
+                createTile(x = 0, y = 0) {
+                    let width = (this.image.width / this.map.x),
+                        height = (this.image.height / this.map.y);
+
+                    return new Tile(this.image, {
+                        x: x * (this.image.width / this.map.x),
+                        y: y * (this.image.height / this.map.y)
+                    }, width, height);
+                }
+            }
+            var GameManager = {
+                deltaFrame: 0,
+                oldTimeStemp: 0,
+                width: 1280,
+                height: 640,
+                ctx: document.getElementById("idcanvas").getContext("2d")
+            },
+                Car = {
+                    image: new Image(),
+                    x: 0, y: 192,
+                    speed: 120,
+                    spriteMap: {
+                        x: 0, y: 0
+                    },
+                    width: 64, height: 64,
+                    draw: function () {
+                        GameManager.ctx.beginPath()
+                        GameManager.ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+                        GameManager.ctx.closePath()
+                    }
+                },
+
+                Map = [
+                    [32, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 32, 2, 32,],
+                    [32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 32,],
+                    [2, 40, 40, 40, 40, 40, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 32,],
+                    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 2, 0, 32,],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 32,],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32,],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32,],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32,],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32,],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32,],
+                ],//20*10;
+                tileMap = new TileMap("tiles.png", { x: 5 }, Map);
+
+            tileMap.createTile();
+
+            Car.image.src = "character 1.png";
+
+            document.addEventListener("keydown", function (e) {
+                let pass = { x: Car.x, y: Car.y };
+                if (e.keyCode > 36 && e.keyCode < 41) {
+                    console.log(Car.x, Car.y, Map[Car.y / Car.height][Car.x / Car.width], e);
+                    switch (e.keyCode) {
+                        case 37: Car.spriteMap.y = Car.image.height / 4; //left
+                            Car.x -= (Car.width);
+                            break;
+                        case 38: Car.spriteMap.y = Car.image.height * 3 / 4 //up
+                            Car.y -= Car.height
+                            break;
+                        case 39: Car.spriteMap.y = Car.image.height * 2 / 4; //right
+                            Car.x += Car.width
+                            break
+                        case 40: Car.spriteMap.y = 0 //down
+                            Car.y += Car.height
+                            break
+                    }
+                    if (Car.y < 0 || Car.x < 0 || Map[Car.y / Car.height][Car.x / Car.width] != 1)
+                        Car = { ...Car, ...pass };
+                    e.preventDefault();
+                }
+            });
+            window.requestAnimationFrame(draw);
+
+
+            function draw(timestemp) {
+                GameManager.ctx.clearRect(0, 0, GameManager.width, GameManager.height);
+                tileMap.Tiles.forEach(tile => {
+                    tile.draw();
+                })
+                Car.draw();
+
+                window.requestAnimationFrame(draw);
+            }
+        </script>
+</body>
+
+</html>

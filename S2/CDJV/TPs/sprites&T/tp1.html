@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Sun ,Earth and Moon</title>
+</head>
+
+<body>
+    <!Creating a Canvas Element>
+        <canvas width="300" height="300" id="idcanvas" style="border: black 1px solid">
+            Your browser does not support HTML5 Canvas. Please shift to another
+            browser.
+        </canvas>
+
+        <script type="text/javascript" charset="utf-8">
+
+            var Car = {
+                image: new Image(),
+                x: 100, y: 100,
+                spriteMap: {
+                    x: 0, y: 0
+                },
+                width: 64, height: 64
+            };
+            Car.image.src = "character.png";
+
+
+            var canvas = document.getElementById("idcanvas");
+            var ctx = canvas.getContext("2d");
+            document.addEventListener("keyup", function (e) {
+                console.log(e);
+                switch (e.keyCode) {
+                    case 37: Car.spriteMap.y = Car.image.height / 4 //left
+                        break;
+                    case 38: Car.spriteMap.y = Car.image.height * 3 / 4 //up
+                        break;
+                    case 39: Car.spriteMap.y = Car.image.height * 2 / 4 //right
+                        break
+                    case 40: Car.spriteMap.y = 0 //down
+                        break
+                }
+            }, false);
+            window.requestAnimationFrame(draw);
+            var old = 0;
+
+            function draw(timestemp) {
+                //console.log(timestemp);
+                var delta = timestemp - old;
+                ctx.clearRect(0, 0, 300, 300);
+                ctx.drawImage(Car.image, Car.spriteMap.x, Car.spriteMap.y, Car.image.width / 4, Car.image.height / 4,
+                    Car.x, Car.y, Car.width, Car.height);
+
+                if (delta > 200) {
+                    Car.spriteMap.x += Car.image.width / 4;
+                    if (Car.spriteMap.x >= Car.image.width) Car.spriteMap.x = 0;
+                    old = timestemp;
+                }
+
+                window.requestAnimationFrame(draw);
+            }
+        </script>
+</body>
+
+</html>

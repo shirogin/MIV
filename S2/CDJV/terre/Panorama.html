@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Panorama</title>
+  </head>
+
+  <body>
+    <!Creating a Canvas Element>
+    <canvas
+      width="400"
+      height="198"
+      id="idcanvas"
+      style="border: black 1px solid"
+    >
+      Your browser does not support HTML5 Canvas. Please shift to another
+      browser.
+    </canvas>
+
+    <script type="text/javascript" charset="utf-8">
+
+      var image= new Image(),
+      p=0;
+      d=1;
+      image.src = "National_Pa.jpg";
+      console.log(image.width,image.height)
+      draw();
+
+      function draw() {
+        var ctx = document.getElementById("idcanvas").getContext("2d");
+        ctx.clearRect(0, 0, 400, image.height); // effacer le canvas
+        ctx.drawImage(image, 0, 0,400,image.height,-p,0,image.width/2,image.height);
+        p+=d;
+        if(p<0 || p> (image.width/2)-400)d=-d;
+          console.log(p);
+        window.requestAnimationFrame(draw);
+      }
+    </script>
+  </body>
+</html>

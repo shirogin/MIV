@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Document</title>
+    <style>
+        body {
+            display: flex;
+            margin: 0;
+            min-height: 100vh;
+            min-width: 100vw;
+        }
+
+        #Main {
+            margin: auto;
+            background-color: rgb(49, 33, 33);
+            border: 1px black solid;
+            border-radius: 0.5em;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas width="1000" height="600" id="Main" style="transform: rotate(180deg)">
+    </canvas>
+    <script src="./EngineJS/engine.js"></script>
+    <script src="./GameObjects.js"></script>
+    <script>
+
+        let gameManager = new GameManager("Main");
+
+        let paddle = new Paddle("main", new Vector2(200, 200), { w: 80, h: 20 }, new Vector2(60, 0));
+        let ball = new Paddle("main", new Vector2(500, 210), { w: -80, h: 20 }, new Vector2(-60, 0));
+
+    </script>
+</body>
+
+</html>
