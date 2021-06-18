@@ -1,0 +1,51 @@
+[System]
+Name='EX1'
+Type='mamdani'
+Version=2.0
+NumInputs=2
+NumOutputs=1
+NumRules=12
+AndMethod='min'
+OrMethod='max'
+ImpMethod='min'
+AggMethod='max'
+DefuzzMethod='centroid'
+
+[Input1]
+Name='h'
+Range=[74 86]
+NumMFs=3
+MF1='PETIT':'trapmf',[75 77 78 79]
+MF2='MOYEN':'trapmf',[78 79 81 83]
+MF3='HAUT':'trapmf',[80 83 85 85]
+
+[Input2]
+Name='dh'
+Range=[-1 1]
+NumMFs=4
+MF1='Négatif':'trimf',[-0.4 -0 0.2]
+MF2='Trée-Négatif':'trimf',[-0.9 -0.5 -0.3]
+MF3='Positif':'trimf',[0 0.4 0.6]
+MF4='Trée-Positif':'trimf',[0.5 0.8 0.8]
+
+[Output1]
+Name='u'
+Range=[-2 2]
+NumMFs=3
+MF1='BAS':'trimf',[-1 -0.4 -0.2]
+MF2='MOYEN-HAUT':'trimf',[-0.4 0 0.8]
+MF3='HAUT':'trimf',[0.2 0.8 1]
+
+[Rules]
+1 2, 3 (1) : 1
+1 3, 3 (1) : 1
+2 2, 3 (1) : 1
+2 3, 1 (1) : 1
+3 2, 1 (1) : 1
+3 3, 1 (1) : 1
+1 1, 3 (1) : 1
+1 4, 2 (1) : 1
+2 1, 3 (1) : 1
+2 4, 1 (1) : 1
+3 1, 1 (1) : 1
+3 4, 1 (1) : 1

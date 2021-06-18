@@ -1,0 +1,71 @@
+[System]
+Name='EX4'
+Type='mamdani'
+Version=2.0
+NumInputs=3
+NumOutputs=1
+NumRules=24
+AndMethod='min'
+OrMethod='max'
+ImpMethod='min'
+AggMethod='max'
+DefuzzMethod='centroid'
+
+[Input1]
+Name='TC'
+Range=[20 80]
+NumMFs=3
+MF1='Avancée':'trimf',[20 35 45]
+MF2='Acceptable':'trimf',[35 45 60]
+MF3='Insuffisante':'trimf',[45 60 80]
+
+[Input2]
+Name='NC'
+Range=[9 70]
+NumMFs=2
+MF1='Dans-les-normes':'trapmf',[9 24 40 55]
+MF2='Hors-normes':'trapmf',[40 55 60 70]
+
+[Input3]
+Name='PI'
+Range=[5 50]
+NumMFs=4
+MF1='Très_grande':'trapmf',[5 10 15 20]
+MF2='Grande':'trapmf',[15 20 25 30]
+MF3='Moyenne':'trapmf',[25 30 35 40]
+MF4='Faible':'trapmf',[35 40 45 50]
+
+[Output1]
+Name='RC'
+Range=[-80 70]
+NumMFs=4
+MF1='Trés_frt':'trimf',[-80 -50 -10]
+MF2='Fort':'trimf',[-50 -10 10]
+MF3='Moyen':'trimf',[-10 10 40]
+MF4='Faible':'trimf',[10 40 70]
+
+[Rules]
+1 1 1, 4 (1) : 1
+2 1 1, 4 (1) : 1
+3 1 1, 4 (1) : 1
+1 1 2, 4 (1) : 1
+2 1 2, 3 (1) : 1
+3 1 2, 3 (1) : 1
+1 1 3, 3 (1) : 1
+2 1 3, 3 (1) : 1
+3 1 3, 3 (1) : 1
+1 1 4, 4 (1) : 1
+2 1 4, 4 (1) : 1
+3 1 4, 4 (1) : 1
+1 2 1, 3 (1) : 1
+2 2 1, 3 (1) : 1
+3 2 1, 3 (1) : 1
+1 2 2, 3 (1) : 1
+2 2 2, 2 (1) : 1
+3 2 2, 2 (1) : 1
+1 2 3, 2 (1) : 1
+2 2 3, 2 (1) : 1
+3 2 3, 1 (1) : 1
+1 2 4, 1 (1) : 1
+2 2 4, 1 (1) : 1
+3 2 4, 1 (1) : 1

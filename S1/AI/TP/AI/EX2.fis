@@ -1,0 +1,47 @@
+[System]
+Name='EX2'
+Type='mamdani'
+Version=2.0
+NumInputs=2
+NumOutputs=1
+NumRules=9
+AndMethod='min'
+OrMethod='max'
+ImpMethod='min'
+AggMethod='max'
+DefuzzMethod='centroid'
+
+[Input1]
+Name='E'
+Range=[0 170]
+NumMFs=3
+MF1='Négative':'trapmf',[0 30 40 60]
+MF2='Nulle':'trapmf',[40 60 90 120]
+MF3='Positive':'trapmf',[90 120 140 170]
+
+[Input2]
+Name='DE'
+Range=[0 38]
+NumMFs=3
+MF1='Négative':'trapmf',[0 6 14 20]
+MF2='Nulle':'trapmf',[14 20 24 27]
+MF3='Positive':'trapmf',[24 27 30 38]
+
+[Output1]
+Name='V'
+Range=[5 38]
+NumMFs=3
+MF1='Faible':'trimf',[5 10 20]
+MF2='Moyenne':'trimf',[10 20 30]
+MF3='Forte':'trimf',[20 30 38]
+
+[Rules]
+1 1, 2 (1) : 1
+2 2, 2 (1) : 1
+3 3, 2 (1) : 1
+2 1, 3 (1) : 1
+2 3, 1 (1) : 1
+3 2, 3 (1) : 1
+1 2, 1 (1) : 1
+1 3, 1 (1) : 1
+2 3, 1 (1) : 1
