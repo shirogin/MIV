@@ -1,211 +1,139 @@
-x1 = y1 = x2 = y2 = 0
-longeur = largeur = 0
-img = None
-padding = 5
-areaSelected = False
-mse = None
 
 
-def getFrame2():
-    global frame1
-    global frame2
-    global x1
-    global y1
-    global padding
-
-    noLoop()
-    img = loadImage('frame2.png')
-    image(img, 0, 0)
-    image(frame1, 0, 0)
-
-    stroke(255)
-    fill(255, 255, 255)
-    rect(1000, 0, 300, 600)
-    instructions()
-
-    frame2 = get(x1-padding, y1-padding, longeur+2*padding, largeur+2*padding)
-
-    # Area to compare on
-    noFill()
-    stroke(50, 255, 50)
-    rect(x1-padding, y1-padding, longeur+2*padding, largeur+2*padding)
-
-    bestMatch()
+images = []
+current_Image = 0
+selectArea = None
+selectedArea = None
+ImageP = 48
+ImageSize = {"width": 1024, "height": 592}
 
 
-def bestMatch():
-    global frame1
-    global frame2
-    global padding
-    global x1
-    global y1
-    global longeur
-    global largeur
-    global mse
+class Select:
+    def __init__(self, color, x, y, width=None, height=None):
+        self.color = color
+        self.cx = x
+        self.x = int(round(x/16)*16)
+        self.cy = y
+        self.y = int(round(y/16)*16)
+        if(width == None and height == None):
+            self.change(x, y)
+        else:
+            self.width = int(width)
+            self.height = int(height)
 
-    mse = None
-    xTemp = -1
-    yTemp = -1
-    print(padding)
-    for i in xrange(2*padding):
-        for j in xrange(2*padding):
-            bloc = frame2.get(i, j, longeur, largeur)
-            newMse = MSE(frame1, bloc)
-            if mse == None:
-                print(i, j)
-                mse = newMse
-                xTemp = i
-                yTemp = j
-            elif mse > newMse:
-                print(i, j)
-                print("old val "+str(mse))
-                mse = newMse
-                print("new val "+str(mse))
-                xTemp = i
-                yTemp = j
+    def positiveSelect(self):
+        return Select(self.color, self.x+self.width if self.width < 0 else self.x, self.y+self.height if self.height < 0 else self.y, abs(self.width), abs(self.height))
 
-    # Best match
-    stroke(50, 50, 255)
-    rect(x1 + xTemp - padding, y1 + yTemp - padding, longeur, largeur)
+    def copy(self, color=None):
+        return Select(self.color if color == None else color, self.x, self.y, self.width, self.height)
 
-    # Print MSE
-    instructions()
-    mse = None
-    # loop()
+    def draw(self):
+        stroke(self.color)
+        noFill()
+        rect(self.x, self.y, self.width, self.height)
+
+    def change(self, x, y):
+        self.width = (round((x-self.x)/16)*16)
+        self.height = (round((y-self.y)/16)*16)
+
+    def valid(self):
+        return abs(self.width) >= 16 and abs(self.height) >= 16
 
 
-def MSE(frame, bloc):
-    global longeur
-    global largeur
-    frame.loadPixels()
-    bloc.loadPixels()
-    mse = 0
+class MPEG:
+    def __init__(self, frame1, frame2, selectedArea, padding=1):
+        self.frame1 = frame1
+        self.frame2 = frame2
+        self.selectedArea = selectedArea.positiveSelect()
+        self.padding = padding
+        self.frame = self.frame1.get(
+            self.selectedArea.x-ImageP, self.selectedArea.y, self.selectedArea.width, self.selectedArea.height)
+        self.frame.loadPixels()
+        self.GlobalSelect = Select("#15c2b6", self.selectedArea.x-(16*self.padding), self.selectedArea.y-(
+            16*self.padding), self.selectedArea.width+(2*(16*self.padding)), self.selectedArea.height+(2*(16*self.padding)))
+        self.bestMatch()
 
-    for x in range(longeur * largeur):
-        mse += (brightness(bloc.pixels[x]) - brightness(frame.pixels[x]))**2
-    mse = mse/(longeur * largeur)
-    return mse
+    def bestMatch(self):
+        mse = None
+        max = [0, 0]
+        for i in range(-16*self.padding, 16*self.padding):
+            for j in range(-16*self.padding, 16*self.padding):
+                bloc = self.frame2.get(self.selectedArea.x-ImageP + i, self.selectedArea.y +
+                                       j, self.selectedArea.width, self.selectedArea.height)
+                newMse = self.MSE(bloc)
+                if mse == None or mse > newMse:
+                    mse = newMse
+                    max = [i, j]
+        self.MSEArea = Select("#cfcf1b",
+                              self.selectedArea.x + max[0], self.selectedArea.y + max[1], self.selectedArea.width, self.selectedArea.height)
+        print(mse, max)
+
+    def MSE(self, bloc):
+        bloc.loadPixels()
+        mse = 0
+        for x in range(self.selectedArea.width * self.selectedArea.height):
+            mse += (brightness(bloc.pixels[x]) -
+                    brightness(self.frame.pixels[x])) ** 2
+        return mse/(self.selectedArea.width * self.selectedArea.height)
 
 
 def setup():
-    global img
-    background(255)
-    img = loadImage('frame1.png')
-    size(1300, 600)
-    image(img, 0, 0)
+    global images
+    textAlign(CENTER)
+    size(ImageSize["width"]+ImageP, ImageSize["height"])
+    images = [loadImage("frame1.png"), loadImage("frame2.png")]
 
 
 def draw():
-    background(0)
-    image(img, 0, 0)
-    stroke(255)
-    fill(255, 255, 255)
-    rect(1000, 0, 300, 600)
-    instructions()
+    if(current_Image == 0):
+        global selectArea
+        background("#b0630b")
+        image(images[0], ImageP, 0)
+        if(selectArea != None):
+            selectArea.draw()
+        rotatedMessage("Select wanted Area")
 
-    # strokeWeight(2)
-    noFill()
-    stroke(255, 50, 50)
-    rect(x1, y1, longeur, largeur)
+
+def rotatedMessage(msg):
+    pushMatrix()
+    rotate(radians(-90))
+    text(msg, -300, 20)
+    popMatrix()
+
+
+def keyTyped():
+    global selectedArea
+    global current_Image
+    if current_Image == 1 and key == '\n':
+        selectedArea = None
+        current_Image = 0
 
 
 def mousePressed():
-    global x1
-    global y1
-    global areaSelected
-    if not areaSelected:
-        x1 = mouseX
-        y1 = mouseY
+    global selectArea
+    if(current_Image == 0 and mouseX > ImageP):
+        selectArea = Select("#ff0000", mouseX, mouseY)
 
 
 def mouseDragged():
-    global x1
-    global y1
-    global x2
-    global y2
-    global longeur
-    global largeur
-    global frame1
-    global areaSelected
-    if not areaSelected and mouseX < 1000 and mouseY < 600:
-        longeur = mouseX-x1
-        largeur = mouseY-y1
-
-        stroke(255, 50, 50)
-        rect(x1, y1, longeur, largeur)
+    global selectArea
+    if(current_Image == 0 and mouseX > ImageP and mouseX < (ImageSize["width"]+ImageP) and mouseY < ImageSize["height"] and mouseY > 0 and selectArea):
+        selectArea.change(mouseX, mouseY)
 
 
 def mouseReleased():
-    global x1
-    global y1
-    global x2
-    global y2
-    global longeur
-    global largeur
-    global frame1
-    global areaSelected
-    if not areaSelected:
-        if longeur < 0:
-            x2 = x1
-            x1 += longeur
-            longeur = -longeur
-        else:
-            x2 = x1 + longeur
+    global selectArea
+    global current_Image
+    if(current_Image == 0 and mouseX > ImageP and selectArea != None and selectArea.valid()):
+        global selectedArea
+        print(selectArea)
+        selectedArea = selectArea.copy("#ff5522")
+        sel = MPEG(images[0], images[1], selectArea)
+        background("#b0630b")
+        image(images[1], ImageP, 0)
+        rotatedMessage("Press ENTER to restart the process")
+        sel.GlobalSelect.draw()
+        sel.MSEArea.draw()
+        current_Image = 1
 
-        if largeur < 0:
-            y2 = y1
-            y1 += largeur
-            largeur = -largeur
-        else:
-            y2 = y1 + largeur
-        print("x1: ", x1)
-        print("y1: ", y1)
-        print("x2: ", x2)
-        print("y2: ", y2)
-        print("longeur: ", longeur)
-        print("largeur: ", largeur)
-        frame1 = get(x1, y1, longeur, largeur)
-        areaSelected = True
-        getFrame2()
-
-
-def keyPressed():
-    global img
-    global x1, x2, y1, y2, longeur, largeur, areaSelected, mse
-    if key == "r" or key == "R":
-        background(255)
-        img = loadImage('frame1.png')
-        image(img, 0, 0)
-        x1 = y1 = x2 = y2 = 0
-        longeur = largeur = 0
-        mse = None
-        areaSelected = False
-        loop()
-
-
-def instructions():
-    global mse
-    textSize(32)
-    fill(0, 102, 153)
-    text("Instructions:", 1050, 30)
-
-    textSize(16)
-    fill(0, 102, 153)
-    text("- to draw the rectangle to study on,", 1005, 70)
-    text("  hold mouse button and draw", 1005, 90)
-    text("  the rectangle", 1005, 110)
-
-    textSize(16)
-    fill(0, 102, 153)
-    text("- to reset the images and try again", 1005, 150)
-    text("  the process click on the ' r ' or ' R '", 1005, 170)
-    text("  key", 1005, 190)
-
-    if not mse == None:
-        textSize(20)
-        fill(44, 191, 69)
-        text("Best MSE: " + str(mse), 1015, 300)
-
-        textSize(16)
-        fill(196, 156, 33)
-        text("click ' r ' or ' R ' to try again", 1045, 570)
+    selectArea = None

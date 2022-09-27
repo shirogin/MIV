@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=763, initial-scale=1.0" />
+        <title>Game Theory</title>
+        <link rel="shortcut icon" href="images/icon.png" type="image/x-icon" />
+        <link rel="stylesheet" href="./css/style.css" />
+        <script src="./js/jquery-3.6.0.min.js"></script>
+    </head>
+    <body>
+        <img src="./images/icon.png" alt="" />
+        <h1>Games Theory</h1>
+        <div class="body">
+            <div class="row">
+                <a class="btn" id="Start">Start a Game</a>
+            </div>
+            <div class="DescriptionBody">
+                <h2>Description</h2>
+                <textarea class="Description" name="Description" rows="4"></textarea>
+                <h2>Number of players</h2>
+                <input type="number" class="Description" name="Number" value="2" min="2" />
+            </div>
+            <div class="StrategiesBody">
+                <h2 class="StrategiesBody">Enter the number of strategies for each player</h2>
+                <div id="StrategiesBody"></div>
+            </div>
+
+            <div class="Table">
+                <table></table>
+                <p></p>
+            </div>
+            <div class="Table row">
+                <a class="btn" id="Sdominance">Strict dominance </a>
+                <a class="btn" id="Wdominance">Weakly dominance</a>
+                <a class="btn" id="IESDS">IESDS</a>
+                <a class="btn" id="Nequilibrium">Nash equilibrium</a>
+                <a class="btn" id="Pequilibrium">Pareto equilibrium</a>
+            </div>
+            <div class="row">
+                <a class="btn" id="Back">Back</a>
+                <a class="btn" id="Next">Next</a>
+            </div>
+        </div>
+        <script defer src="./js/script.js"></script>
+    </body>
+</html>

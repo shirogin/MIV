@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+            }
+            body {
+                height: 100vh;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- <canvas id="canvas"></canvas> -->
+
+        <script>
+            let canvasElement = document.getElementById("canvas");
+            canvasElement.width = window.innerWidth;
+            canvasElement.height = window.innerHeight;
+            let ctx = canvasElement.getContext("2d");
+
+            let uzaki = {
+                img: new Image(),
+                x: 0,
+                y: 0,
+                dx: 0,
+                dy: 0,
+                speed: 4,
+                frame: 0,
+                frameRate: 0,
+                directions: {
+                    down: 0,
+                    left: 1,
+                    right: 2,
+                    up: 3,
+                },
+                direction: 0,
+                keypresses: {},
+            };
+
+            uzaki.img.src = "character.png";
+
+            let tileset = new Image();
+            tileset.src = "tileset.png";
+
+            document.addEventListener("keydown", keyDownEvent);
+            function keyDownEvent(e) {
+                uzaki.keypresses[event.key] = true;
+            }
+
+            document.addEventListener("keyup", keyUpEvent);
+            function keyUpEvent(e) {
+                uzaki.keypresses[event.key] = false;
+            }
+            function drawCharacter() {
+                let sw = uzaki.img.width / 4;
+                let sh = uzaki.img.height / 4;
+
+                ctx.drawImage(
+                    uzaki.img,
+                    uzaki.frame * sw,
+                    uzaki.direction * sh,
+                    sw,
+                    sh,
+                    uzaki.x,
+                    uzaki.y,
+                    sw,
+                    sh
+                );
+
+                uzaki.frameRate++;
+                if (uzaki.frameRate >= 12) {
+                    uzaki.frameRate = 0;
+                    uzaki.frame = (uzaki.frame + 1) % 4;
+                }
+            }
+
+            function moveCharacter() {
+                if (!uzaki.keypresses["ArrowLeft"] && uzaki.keypresses["ArrowRight"]) {
+                    uzaki.dx = 1;
+                    uzaki.direction = uzaki.directions.right;
+                } else if (uzaki.keypresses["ArrowLeft"]) {
+                    uzaki.dx = -1;
+                    uzaki.direction = uzaki.directions.left;
+                } else uzaki.dx = 0;
+                if (uzaki.keypresses["ArrowUp"]) {
+                    uzaki.dy = -1;
+                    if (uzaki.keypresses["ArrowLeft"] || uzaki.keypresses["ArrowRight"]) {
+                        uzaki.dx /= 1.5;
+                        uzaki.dy /= 1.5;
+                    }
+                    uzaki.direction = uzaki.directions.up;
+                } else if (uzaki.keypresses["ArrowDown"]) {
+                    uzaki.dy = 1;
+                    if (uzaki.keypresses["ArrowLeft"] || uzaki.keypresses["ArrowRight"]) {
+                        uzaki.dx /= 1.5;
+                        uzaki.dy /= 1.5;
+                    }
+                    uzaki.direction = uzaki.directions.down;
+                } else uzaki.dy = 0;
+                uzaki.x += uzaki.dx * uzaki.speed;
+                uzaki.y += uzaki.dy * uzaki.speed;
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+                drawCharacter();
+                moveCharacter();
+                window.requestAnimationFrame(draw);
+            }
+
+            draw();
+        </script>
+    </body>
+</html>

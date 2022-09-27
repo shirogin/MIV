@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1635803343 source:e:\workspace\miv\s3\si\tp\tp2\main.cpp
+	<GLFW/glfw3.h>
+	<iostream>
+

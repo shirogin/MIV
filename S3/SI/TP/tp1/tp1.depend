@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1635799465 source:e:\workspace\miv\s3\si\tp\tp1\main.cpp
+	"predef.h"
+
+1635798132 e:\workspace\miv\s3\si\tp\tp1\predef.h
+	<GLFW/glfw3.h>
+	<iostream>
+	<stdlib.h>
+	<list>
+

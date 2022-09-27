@@ -1,0 +1,66 @@
+{
+    "display":{
+        "height" : 600,
+        "width" : 900,
+        "background":[255,255,255],
+        "fill":[112, 112, 112],
+        "winner":[80,80,80],
+        "table":{
+            "stroke":9,
+            "width" : 400,
+            "height" : 400,
+            "x" : 250,
+            "y" : 140
+        },
+        "shapes":{
+            "circle":{
+                "radius":60,
+                "color":[112,112,112]
+            },
+            "cross":{
+                "lines":[
+                    [{"x": -30, "y": -30},{"x": 30, "y": 30}],
+                    [{"x": -30, "y": 30},{"x": 30, "y": -30}]
+                ],
+                "color":[112,112,112]
+            }
+        },
+        "scores":[
+            {
+                "name":{
+                    "x":65,
+                    "y":200,
+                    "size":25
+                },
+                "score":{
+                    "x":90,
+                    "y":300,
+                    "size":60
+                },
+                "color":[112,112,112],
+                "highlighted":[80,80,80]
+            },
+            {
+                "name":{
+                    "x":745,
+                    "y":200,
+                    "size":25
+                },
+                "score":{
+                    "x":770,
+                    "y":300,
+                    "size":60
+                },
+                "color":[112,112,112],
+                "highlighted":[80,80,80]
+            }
+        ]
+    },
+    "render":{
+        "FPS" : 60
+    },
+    "gamePlay":{
+        "AI" : true,
+        "difficulty" : 2
+    }
+}
